@@ -11,7 +11,7 @@ class ForecastClient:
         self._session = requests.Session()
 
     def _request(self,
-                 url: str,
+                 path: str,
                  type_: Optional[str] = 'GET',
                  headers: Optional[dict] = None,
                  data: Optional[dict] = None) -> dict:
@@ -26,7 +26,7 @@ class ForecastClient:
         if isinstance(headers, dict):
             final_headers.update(headers)
 
-        req = requests.Request(type_, url, headers=final_headers, data=data)
+        req = requests.Request(type_, f'https://api.forecast.it/api{path}', headers=final_headers, data=data)
         prepped = self._session.prepare_request(req)
 
         res = self._session.send(prepped)
