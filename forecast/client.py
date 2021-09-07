@@ -14,7 +14,7 @@ class ForecastClient:
                  url: str,
                  type_: Optional[str] = 'GET',
                  headers: Optional[dict] = None,
-                 data: Optional[dict] = None) -> 'requests.Response':
+                 data: Optional[dict] = None) -> dict:
         type_ = type_.upper()
         valid_types = {'GET', 'POST', 'PUT', 'DELETE'}
         if type_ not in valid_types:
@@ -37,4 +37,4 @@ class ForecastClient:
             message = json['message']
             raise ForecastAPIError(f'Forecast API responded with status {res.status_code}: {message}') from e
 
-        return res
+        return json
