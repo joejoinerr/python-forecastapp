@@ -15,11 +15,11 @@ class ForecastClient:
         # To get an individual person, use `ForecastClient.person()`
         self.people = models.PeopleHelper(self)
 
-    def _request(self,
-                 path: str,
-                 type_: Optional[str] = 'GET',
-                 headers: Optional[dict] = None,
-                 data: Optional[dict] = None) -> dict:
+    def request(self,
+                path: str,
+                type_: Optional[str] = 'GET',
+                headers: Optional[dict] = None,
+                data: Optional[dict] = None) -> dict:
         type_ = type_.upper()
         valid_types = {'GET', 'POST', 'PUT', 'DELETE'}
         if type_ not in valid_types:

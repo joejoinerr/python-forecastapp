@@ -12,6 +12,6 @@ class PeopleHelper:
         self._forecast = _forecast
 
     def __call__(self, *args, **kwargs):
-        raw = self._forecast._request(API_PATH['persons'])
+        raw = self._forecast.request(API_PATH['persons'])
         for raw_person in raw:
             yield Person(self._forecast, raw_person)
