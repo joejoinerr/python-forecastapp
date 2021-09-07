@@ -74,3 +74,9 @@ class Person:
     @property
     def updated_at(self) -> str:
         return self.raw['updated_at']
+
+    def __repr__(self):
+        if self.email:
+            return f'<forecast.Person(name=\'{self.name}\', email=\'{self.email}\')>'
+        else:
+            return f'<forecast.Person(name=\'{self.name}\')>'
