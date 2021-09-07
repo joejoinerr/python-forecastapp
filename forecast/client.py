@@ -2,6 +2,7 @@ from typing import Optional
 
 import requests
 
+from . import models
 from .exceptions import ForecastAPIError
 
 
@@ -9,6 +10,10 @@ class ForecastClient:
     def __init__(self, api_key: str) -> None:
         self.api_key = api_key
         self._session = requests.Session()
+
+        # Interface for interacting with people, including creating new people.
+        # To get an individual person, use `ForecastClient.person()`
+        self.people = models.PeopleHelper(self)
 
     def _request(self,
                  path: str,
