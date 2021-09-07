@@ -17,13 +17,15 @@ class ForecastClient:
 
     def request(self,
                 path: str,
-                type_: Optional[str] = 'GET',
+                request_type: Optional[str] = 'GET',
                 headers: Optional[dict] = None,
                 data: Optional[dict] = None) -> dict:
-        type_ = type_.upper()
+        if not isinstance(request_type, str):
+            raise TypeError('`request_type` should be string.')
+        request_type = request_type.upper()
         valid_types = {'GET', 'POST', 'PUT', 'DELETE'}
-        if type_ not in valid_types:
-            raise ValueError(f'`type_` should be one of: {", ".join(valid_types)}')
+        if request_type not in valid_types:
+            raise ValueError(f'`request_type` should be one of: {", ".join(valid_types)}.')
 
         final_headers = {
             'x-forecast-api-key': self.api_key,
@@ -31,7 +33,9 @@ class ForecastClient:
         if isinstance(headers, dict):
             final_headers.update(headers)
 
-        req = requests.Request(type_, f'https://api.forecast.it/api{path}', headers=final_headers, data=data)
+        req = requests.Request(request_type, f'https://api.forecast.it/api{path}',
+                               headers=final_headers,
+                               data=data)
         prepped = self._session.prepare_request(req)
 
         res = self._session.send(prepped)
