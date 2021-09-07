@@ -34,7 +34,7 @@ class ForecastClient:
         try:
             res.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            message = json['message']
+            message = json.get('message')
             raise ForecastAPIError(f'Forecast API responded with status {res.status_code}: {message}') from e
 
         return json
