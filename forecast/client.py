@@ -15,9 +15,13 @@ class ForecastClient:
         # To get an individual person, use `ForecastClient.person()`
         self.people = models.PeopleHelper(self)
 
+        # Interface frore interacting with tasks
+        self.tasks = models.TasksHelper(self)
+
     def request(self,
                 path: str,
                 request_type: Optional[str] = 'GET',
+                params: Optional[dict] = None,
                 headers: Optional[dict] = None,
                 data: Optional[dict] = None) -> dict:
         if not isinstance(request_type, str):
@@ -34,6 +38,7 @@ class ForecastClient:
             final_headers.update(headers)
 
         req = requests.Request(request_type, f'https://api.forecast.it/api{path}',
+                               params=params,
                                headers=final_headers,
                                data=data)
         prepped = self._session.prepare_request(req)
