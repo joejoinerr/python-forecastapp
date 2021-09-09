@@ -1,20 +1,37 @@
 import datetime
-from typing import TYPE_CHECKING, List, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Optional
+)
+
+from ..const import API_PATH
 
 if TYPE_CHECKING:
     import forecast
 
 
-class Task:
+class Task(object):
     def __init__(self,
                  _forecast: 'forecast.ForecastClient',
-                 raw: dict):
+                 _id: int,
+                 raw: Optional[Dict[str, Any]] = None):
         self._forecast = _forecast
+        self._id = _id
         self.raw = raw
+
+    def __getattribute__(self, item):
+        """Lazy load the JSON response"""
+        if item == 'raw' and not object.__getattribute__(self, 'raw'):
+            path = API_PATH['task'].format(id=object.__getattribute__(self, '_id'))
+            self.raw = object.__getattribute__(self, '_forecast').request(path)
+        return object.__getattribute__(self, item)
 
     @property
     def id(self):
-        return int(self.raw['id'])
+        return self._id
 
     @property
     def company_task_id(self) -> int:
@@ -119,4 +136,3 @@ class Task:
     @property
     def updated_at(self) -> 'datetime.datetime':
         return datetime.datetime.fromisoformat(self.raw['updated_at'])
-

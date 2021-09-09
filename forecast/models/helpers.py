@@ -1,5 +1,5 @@
 import datetime
-from typing import TYPE_CHECKING, Generator, Union
+from typing import TYPE_CHECKING, Iterable, Union
 
 from ..const import API_PATH
 from . import Person, Task
@@ -15,7 +15,7 @@ class TasksHelper:
     def __call__(self,
                  *args,
                  updated_after: Union[str, 'datetime.datetime', None] = None,
-                 **kwargs) -> Generator['forecast.models.Task']:
+                 **kwargs) -> Iterable['forecast.models.Task']:
         params = None
         if updated_after:
             if isinstance(updated_after, str):
@@ -25,14 +25,17 @@ class TasksHelper:
             }
         raw = self._forecast.request(API_PATH['tasks'], params=params)
         for raw_task in raw:
-            yield Task(self._forecast, raw_task)
+            yield Task(self._forecast, raw_task['id'], raw_task)
+
+    def from_id(self, id_):
+        return Task(self._forecast, id_)
 
 
 class PeopleHelper:
     def __init__(self, _forecast: 'forecast.ForecastClient'):
         self._forecast = _forecast
 
-    def __call__(self, *args, **kwargs) -> Generator['forecast.models.Person']:
+    def __call__(self, *args, **kwargs) -> Iterable['forecast.models.Person']:
         raw = self._forecast.request(API_PATH['persons'])
         for raw_person in raw:
             yield Person(self._forecast, raw_person)
