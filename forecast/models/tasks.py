@@ -23,9 +23,9 @@ class Task(object):
         self.raw = raw
 
     def __getattribute__(self, item):
-        """Lazy load the JSON response"""
+        # Lazy load the JSON response so that we can create a Task without it
         if item == 'raw' and not object.__getattribute__(self, 'raw'):
-            path = API_PATH['task'].format(id=object.__getattribute__(self, '_id'))
+            path = API_PATH['task_id'].format(id=object.__getattribute__(self, '_id'))
             self.raw = object.__getattribute__(self, '_forecast').request(path)
         return object.__getattribute__(self, item)
 
