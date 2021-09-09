@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING, Optional, Dict
 
+from ..const import API_PATH
+
 if TYPE_CHECKING:
     import forecast
 
@@ -7,13 +9,22 @@ if TYPE_CHECKING:
 class Person:
     def __init__(self,
                  _forecast: 'forecast.ForecastClient',
+                 _id: int,
                  raw: dict):
         self._forecast = _forecast
+        self._id = _id
         self.raw = raw
+
+    def __getattribute__(self, item):
+        # Lazy load the JSON response so that we can create a Person without it
+        if item == 'raw' and not object.__getattribute__(self, 'raw'):
+            path = API_PATH['person_id'].format(id=object.__getattribute__(self, '_id'))
+            self.raw = object.__getattribute__(self, '_forecast').request(path)
+        return object.__getattribute__(self, item)
 
     @property
     def id(self) -> int:
-        return int(self.raw['id'])
+        return self._id
 
     @property
     def name(self) -> str:
