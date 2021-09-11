@@ -162,6 +162,6 @@ class Project:
         if object.__getattribute__(self, 'raw'):
             return f'<forecast.Project(id=\'{self.id}\', name=\'{self.name}\')>'
         else:
-            return f'<forecast.Task(id=\'{self.id}\')>'
+            return f'<forecast.Project(id=\'{self.id}\')>'
 
 
