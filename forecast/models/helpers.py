@@ -43,3 +43,6 @@ class PeopleHelper:
         raw = self._forecast.request(API_PATH['persons'])
         for raw_person in raw:
             yield Person(self._forecast, raw_person['id'], raw_person)
+            
+    def from_id(self, id_: int) -> 'forecast.models.Person':
+        return Person(self._forecast, id_)

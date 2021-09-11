@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Dict
+from typing import TYPE_CHECKING, Any, Optional, Dict
 
 from ..const import API_PATH
 
@@ -10,7 +10,7 @@ class Person:
     def __init__(self,
                  _forecast: 'forecast.ForecastClient',
                  _id: int,
-                 raw: dict):
+                 raw: Optional[Dict[str, Any]] = None):
         self._forecast = _forecast
         self._id = _id
         self.raw = raw
