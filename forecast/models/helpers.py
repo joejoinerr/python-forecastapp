@@ -2,7 +2,7 @@ import datetime
 from typing import TYPE_CHECKING, Iterable, Union
 
 from ..const import API_PATH
-from . import Person, Task
+from . import Person, Task, Project
 
 if TYPE_CHECKING:
     import forecast
@@ -43,6 +43,23 @@ class PeopleHelper:
         raw = self._forecast.request(API_PATH['persons'])
         for raw_person in raw:
             yield Person(self._forecast, raw_person['id'], raw_person)
-            
+
     def from_id(self, id_: int) -> 'forecast.models.Person':
         return Person(self._forecast, id_)
+
+
+class ProjectsHelper:
+    def __init__(self, _forecast: 'forecast.ForecastClient'):
+        self._forecast = _forecast
+
+    def __call__(self, *args, **kwargs) -> Iterable['forecast.models.Project']:
+        raw = self._forecast.request(API_PATH['projects'])
+        for raw_project in raw:
+            yield Project(self._forecast, raw_project['id'], raw_project)
+
+    def from_id(self, id_: int) -> 'forecast.models.Project':
+        return Project(self._forecast, id_)
+
+    def from_company_id(self, company_id: int) -> 'forecast.models.Project':
+        raw_project = self._forecast.request(API_PATH['project_company_id'].format(id=company_id))
+        return Project(self._forecast, raw_project['id'], raw_project)

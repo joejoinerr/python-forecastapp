@@ -18,6 +18,9 @@ class ForecastClient:
         # Interface frore interacting with tasks
         self.tasks = models.TasksHelper(self)
 
+        # Interface frore interacting with projects
+        self.projects = models.ProjectsHelper(self)
+
     def request(self,
                 path: str,
                 request_type: Optional[str] = 'GET',
