@@ -87,7 +87,7 @@ class Person:
         return self.raw['updated_at']
 
     def __repr__(self):
-        if self.raw:
-            return f'<forecast.Person(id=\'{self.id}\', name=\'{self.name}\'>'
+        if object.__getattribute__(self, 'raw'):
+            return f'<forecast.Person(id=\'{self.id}\', name=\'{self.name}\')>'
         else:
-            return f'<forecast.Person(id=\'{self.id}\'>'
+            return f'<forecast.Person(id=\'{self.id}\')>'

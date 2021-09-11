@@ -136,3 +136,9 @@ class Task(object):
     @property
     def updated_at(self) -> 'datetime.datetime':
         return datetime.datetime.fromisoformat(self.raw['updated_at'])
+
+    def __repr__(self):
+        if object.__getattribute__(self, 'raw'):
+            return f'<forecast.Task(id=\'{self.id}\', title=\'{self.title}\')>'
+        else:
+            return f'<forecast.Task(id=\'{self.id}\')>'
