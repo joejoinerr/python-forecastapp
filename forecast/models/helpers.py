@@ -27,8 +27,12 @@ class TasksHelper:
         for raw_task in raw:
             yield Task(self._forecast, raw_task['id'], raw_task)
 
-    def from_id(self, id_):
+    def from_id(self, id_: int) -> 'forecast.models.Task':
         return Task(self._forecast, id_)
+
+    def from_company_id(self, company_id: int) -> 'forecast.models.Task':
+        raw_task = self._forecast.request(API_PATH['task_company_id'].format(id=company_id))
+        return Task(self._forecast, raw_task['id'], raw_task)
 
 
 class PeopleHelper:
@@ -38,4 +42,4 @@ class PeopleHelper:
     def __call__(self, *args, **kwargs) -> Iterable['forecast.models.Person']:
         raw = self._forecast.request(API_PATH['persons'])
         for raw_person in raw:
-            yield Person(self._forecast, raw_person)
+            yield Person(self._forecast, raw_person['id'], raw_person)
