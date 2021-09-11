@@ -87,7 +87,7 @@ class Person:
         return self.raw['updated_at']
 
     def __repr__(self):
-        if self.email:
-            return f'<forecast.Person(name=\'{self.name}\', email=\'{self.email}\')>'
+        if self.raw:
+            return f'<forecast.Person(id=\'{self.id}\', name=\'{self.name}\'>'
         else:
-            return f'<forecast.Person(name=\'{self.name}\')>'
+            return f'<forecast.Person(id=\'{self.id}\'>'
