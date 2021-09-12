@@ -1,5 +1,5 @@
 import datetime
-from typing import TYPE_CHECKING, Iterable, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
 from ..const import API_PATH
 from . import Person, Task, Project
@@ -14,25 +14,30 @@ class TasksHelper:
 
     def __call__(self,
                  *args,
+                 task_id: Optional[int] = None,
+                 company_id: Optional[int] = None,
                  updated_after: Union[str, 'datetime.datetime', None] = None,
-                 **kwargs) -> Iterable['forecast.models.Task']:
-        params = None
-        if updated_after:
-            if isinstance(updated_after, str):
-                updated_after = datetime.datetime.fromisoformat(updated_after)
-            params = {
-                'updated_after': updated_after.strftime('%Y%m%dT%H%M%S')
-            }
-        raw = self._forecast.request(API_PATH['tasks'], params=params)
-        for raw_task in raw:
-            yield Task(self._forecast, raw_task['id'], raw_task)
-
-    def from_id(self, id_: int) -> 'forecast.models.Task':
-        return Task(self._forecast, id_)
-
-    def from_company_id(self, company_id: int) -> 'forecast.models.Task':
-        raw_task = self._forecast.request(API_PATH['task_company_id'].format(id=company_id))
-        return Task(self._forecast, raw_task['id'], raw_task)
+                 **kwargs) -> Union[List['forecast.models.Task'],
+                                    'forecast.models.Task',
+                                    None]:
+        if isinstance(task_id, int):
+            return Task(self._forecast, task_id)
+        elif isinstance(company_id, int):
+            raw_task = self._forecast.request(API_PATH['task_company_id'].format(id=company_id))
+            return Task(self._forecast, raw_task['id'], raw_task)
+        else:
+            params = None
+            if updated_after:
+                if isinstance(updated_after, str):
+                    updated_after = datetime.datetime.fromisoformat(updated_after)
+                params = {
+                    'updated_after': updated_after.strftime('%Y%m%dT%H%M%S')
+                }
+            raw = self._forecast.request(API_PATH['tasks'], params=params)
+            if raw:
+                return [Task(self._forecast, raw_task['id'], raw_task) for raw_task in raw]
+            else:
+                return None
 
     def create(self,
                project_id: int,
@@ -87,27 +92,46 @@ class PeopleHelper:
     def __init__(self, _forecast: 'forecast.ForecastClient'):
         self._forecast = _forecast
 
-    def __call__(self, *args, **kwargs) -> Iterable['forecast.models.Person']:
-        raw = self._forecast.request(API_PATH['persons'])
-        for raw_person in raw:
-            yield Person(self._forecast, raw_person['id'], raw_person)
-
-    def from_id(self, id_: int) -> 'forecast.models.Person':
-        return Person(self._forecast, id_)
+    def __call__(self,
+                 *args,
+                 person_id: Optional[int] = None,
+                 **kwargs) -> Union[List['forecast.models.Person'],
+                                    'forecast.models.Person',
+                                    None]:
+        if isinstance(person_id, int):
+            return Person(self._forecast, person_id)
+        else:
+            raw = self._forecast.request(API_PATH['persons'])
+            if raw:
+                return [Person(self._forecast, raw_person['id'], raw_person)
+                        for raw_person in raw]
+            else:
+                return None
 
 
 class ProjectsHelper:
     def __init__(self, _forecast: 'forecast.ForecastClient'):
         self._forecast = _forecast
 
-    def __call__(self, *args, **kwargs) -> Iterable['forecast.models.Project']:
-        raw = self._forecast.request(API_PATH['projects'])
-        for raw_project in raw:
-            yield Project(self._forecast, raw_project['id'], raw_project)
+    def __call__(self,
+                 *args,
+                 project_id: Optional[int] = None,
+                 company_id: Optional[int] = None,
+                 **kwargs) -> Union[List['forecast.models.Project'],
+                                    'forecast.models.Project',
+                                    None]:
+        if isinstance(project_id, int) and isinstance(company_id, int):
+            raise ValueError('Only one of `project_id` or `company_id` should be supplied.')
 
-    def from_id(self, id_: int) -> 'forecast.models.Project':
-        return Project(self._forecast, id_)
-
-    def from_company_id(self, company_id: int) -> 'forecast.models.Project':
-        raw_project = self._forecast.request(API_PATH['project_company_id'].format(id=company_id))
-        return Project(self._forecast, raw_project['id'], raw_project)
+        if isinstance(project_id, int):
+            return Project(self._forecast, project_id)
+        elif isinstance(company_id, int):
+            raw_project = self._forecast.request(API_PATH['project_company_id'].format(id=company_id))
+            return Project(self._forecast, raw_project['id'], raw_project)
+        else:
+            raw = self._forecast.request(API_PATH['projects'])
+            if raw:
+                return [Project(self._forecast, raw_project['id'], raw_project)
+                        for raw_project in raw]
+            else:
+                return None
