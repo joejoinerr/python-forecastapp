@@ -189,8 +189,8 @@ class Phase(ForecastBase, object):
         return object.__getattribute__(self, item)
 
     @property
-    def project_id(self) -> int:
-        return self._project_id
+    def project(self) -> 'forecast.models.projects.Project':
+        return Project(self._forecast, self._project_id)
 
     @property
     def name(self) -> str:
