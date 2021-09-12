@@ -34,6 +34,54 @@ class TasksHelper:
         raw_task = self._forecast.request(API_PATH['task_company_id'].format(id=company_id))
         return Task(self._forecast, raw_task['id'], raw_task)
 
+    def create(self,
+               project_id: int,
+               **kwargs) -> 'forecast.models.Task':
+        if not isinstance(project_id, int):
+            raise ValueError('`project_id` should be an integer.')
+
+        valid = {
+            'title',
+            'description',
+            'role',
+            'estimate',
+            'approved',
+            'start_date',
+            'end_date',
+            'bug',
+            'non_billable',
+            'blocked',
+            'sprint',
+            'workflow_column',
+            'phase',
+            'assigned',
+            'labels',
+            'owner_id',
+        }
+
+        new_task = {k: v for k, v in kwargs.items() if k in valid}
+        new_task['project_id'] = project_id
+
+        if 'estimate' in new_task.keys():
+            for estimate in ['high_estimate', 'low_estimate']:
+                new_task[estimate] = new_task['estimate']
+            del new_task['estimate']
+
+        if 'non_billable' in new_task.keys():
+            new_task['un_billable'] = new_task.pop('non_billable')
+
+        if 'assigned' in new_task.keys():
+            new_task['assigned_persons'] = new_task.pop('assigned')
+
+        if 'phase' in new_task.keys():
+            new_task['milestone'] = new_task.pop('phase')
+
+        created_task = self._forecast.request(API_PATH['tasks'],
+                                              request_type='POST',
+                                              data=new_task)
+
+        return Task(self._forecast, created_task['id'], created_task)
+
 
 class PeopleHelper:
     def __init__(self, _forecast: 'forecast.ForecastClient'):
