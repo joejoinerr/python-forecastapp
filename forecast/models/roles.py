@@ -2,12 +2,13 @@ import datetime
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from ..const import API_PATH
+from .base import ForecastBase
 
 if TYPE_CHECKING:
     import forecast
 
 
-class Role:
+class Role(ForecastBase, object):
     def __init__(self,
                  _forecast: 'forecast.ForecastClient',
                  _id: int,
@@ -24,28 +25,8 @@ class Role:
         return object.__getattribute__(self, item)
 
     @property
-    def id(self) -> int:
-        return self._id
-
-    @property
     def name(self) -> str:
         return self.raw['name']
-
-    @property
-    def created_by(self) -> int:
-        return self.raw['created_by']
-
-    @property
-    def updated_by(self) -> int:
-        return self.raw['updated_by']
-
-    @property
-    def created_at(self) -> 'datetime.datetime':
-        return datetime.datetime.fromisoformat(self.raw['created_at'])
-
-    @property
-    def updated_at(self) -> 'datetime.datetime':
-        return datetime.datetime.fromisoformat(self.raw['updated_at'])
 
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):

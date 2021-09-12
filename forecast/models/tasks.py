@@ -8,12 +8,13 @@ from typing import (
 )
 
 from ..const import API_PATH
+from .base import ForecastBase
 
 if TYPE_CHECKING:
     import forecast
 
 
-class Task(object):
+class Task(ForecastBase, object):
     def __init__(self,
                  _forecast: 'forecast.ForecastClient',
                  _id: int,
@@ -28,10 +29,6 @@ class Task(object):
             path = API_PATH['task_id'].format(id=object.__getattribute__(self, '_id'))
             self.raw = object.__getattribute__(self, '_forecast').request(path)
         return object.__getattribute__(self, item)
-
-    @property
-    def id(self):
-        return self._id
 
     @property
     def company_task_id(self) -> int:
@@ -120,22 +117,6 @@ class Task(object):
     @property
     def owner_id(self) -> int:
         return self.raw['owner_id']
-
-    @property
-    def created_by(self) -> int:
-        return self.raw['created_by']
-
-    @property
-    def updated_by(self) -> int:
-        return self.raw['updated_by']
-
-    @property
-    def created_at(self) -> 'datetime.datetime':
-        return datetime.datetime.fromisoformat(self.raw['created_at'])
-
-    @property
-    def updated_at(self) -> 'datetime.datetime':
-        return datetime.datetime.fromisoformat(self.raw['updated_at'])
 
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):

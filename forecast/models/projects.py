@@ -10,12 +10,13 @@ from typing import (
 )
 
 from ..const import API_PATH
+from .base import ForecastBase
 
 if TYPE_CHECKING:
     import forecast
 
 
-class Project:
+class Project(ForecastBase, object):
     def __init__(self,
                  _forecast: 'forecast.ForecastClient',
                  _id: int,
@@ -30,10 +31,6 @@ class Project:
             path = API_PATH['project_id'].format(id=object.__getattribute__(self, '_id'))
             self.raw = object.__getattribute__(self, '_forecast').request(path)
         return object.__getattribute__(self, item)
-
-    @property
-    def id(self) -> int:
-        return self._id
 
     @property
     def company_project_id(self) -> int:
@@ -151,22 +148,6 @@ class Project:
     def external_refs(self) -> Optional[List]:
         return self.raw.get('external_refs')
 
-    @property
-    def created_by(self) -> int:
-        return self.raw['created_by']
-
-    @property
-    def updated_by(self) -> int:
-        return self.raw['updated_by']
-
-    @property
-    def created_at(self) -> 'datetime.datetime':
-        return datetime.datetime.fromisoformat(self.raw['created_at'])
-
-    @property
-    def updated_at(self) -> 'datetime.datetime':
-        return datetime.datetime.fromisoformat(self.raw['updated_at'])
-
     def phases(self,
                project_id: int,
                phase_id: int = None) -> Union['forecast.models.Phase',
@@ -190,7 +171,7 @@ class Project:
             return f'<forecast.Project(id=\'{self.id}\')>'
 
 
-class Phase:
+class Phase(ForecastBase, object):
     def __init__(self,
                  _forecast: 'forecast.ForecastClient',
                  _id: int,
@@ -208,10 +189,6 @@ class Phase:
                                                    milestone_id=object.__getattribute__(self, '_id'))
             self.raw = object.__getattribute__(self, '_forecast').request(path)
         return object.__getattribute__(self, item)
-
-    @property
-    def id(self) -> int:
-        return self._id
 
     @property
     def project_id(self) -> int:
@@ -236,22 +213,6 @@ class Phase:
             return datetime.date.fromisoformat(end_date)
         else:
             return None
-
-    @property
-    def created_by(self) -> int:
-        return self.raw['created_by']
-
-    @property
-    def updated_by(self) -> int:
-        return self.raw['updated_by']
-
-    @property
-    def created_at(self) -> 'datetime.datetime':
-        return datetime.datetime.fromisoformat(self.raw['created_at'])
-
-    @property
-    def updated_at(self) -> 'datetime.datetime':
-        return datetime.datetime.fromisoformat(self.raw['updated_at'])
 
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):
