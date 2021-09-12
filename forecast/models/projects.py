@@ -3,8 +3,10 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Dict,
+    Iterable,
     List,
-    Optional
+    Optional,
+    Union
 )
 
 from ..const import API_PATH
@@ -165,6 +167,22 @@ class Project:
     def updated_at(self) -> 'datetime.datetime':
         return datetime.datetime.fromisoformat(self.raw['updated_at'])
 
+    def phases(self,
+               project_id: int,
+               phase_id: int = None) -> Union['forecast.models.Phase',
+                                              Iterable['forecast.models.Phase'],
+                                              None]:
+        if isinstance(phase_id, int):
+            return Phase(self._forecast, phase_id, self.id)
+        else:
+            all_phases = self._forecast.request(API_PATH['milestones']
+                                                .format(project_id=project_id))
+            if all_phases:
+                for raw_phase in all_phases:
+                    yield Phase(self._forecast, raw_phase['id'], self.id, raw=raw_phase)
+            else:
+                return None
+
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):
             return f'<forecast.Project(id=\'{self.id}\', name=\'{self.name}\')>'
@@ -172,3 +190,73 @@ class Project:
             return f'<forecast.Project(id=\'{self.id}\')>'
 
 
+class Phase:
+    def __init__(self,
+                 _forecast: 'forecast.ForecastClient',
+                 _id: int,
+                 _project_id: int,
+                 raw: Optional[Dict[str, Any]] = None):
+        self._forecast = _forecast
+        self._id = _id
+        self._project_id = _project_id
+        self.raw = raw
+
+    def __getattribute__(self, item):
+        # Lazy load the JSON response so that we can create a Phase without it
+        if item == 'raw' and not object.__getattribute__(self, 'raw'):
+            path = API_PATH['milestone_id'].format(project_id=object.__getattribute__(self, '_project_id'),
+                                                   milestone_id=object.__getattribute__(self, '_id'))
+            self.raw = object.__getattribute__(self, '_forecast').request(path)
+        return object.__getattribute__(self, item)
+
+    @property
+    def id(self) -> int:
+        return self._id
+
+    @property
+    def project_id(self) -> int:
+        return self._project_id
+
+    @property
+    def name(self) -> str:
+        return self.raw['name']
+
+    @property
+    def start_date(self) -> Optional['datetime.date']:
+        start_date = self.raw.get('start_date')
+        if start_date:
+            return datetime.date.fromisoformat(start_date)
+        else:
+            return None
+
+    @property
+    def end_date(self) -> Optional['datetime.date']:
+        end_date = self.raw.get('end_date')
+        if end_date:
+            return datetime.date.fromisoformat(end_date)
+        else:
+            return None
+
+    @property
+    def created_by(self) -> int:
+        return self.raw['created_by']
+
+    @property
+    def updated_by(self) -> int:
+        return self.raw['updated_by']
+
+    @property
+    def created_at(self) -> 'datetime.datetime':
+        return datetime.datetime.fromisoformat(self.raw['created_at'])
+
+    @property
+    def updated_at(self) -> 'datetime.datetime':
+        return datetime.datetime.fromisoformat(self.raw['updated_at'])
+
+    def __repr__(self):
+        if object.__getattribute__(self, 'raw'):
+            return f'<forecast.Phase(id=\'{self.id}\', ' \
+                   f'project_id=\'{self.project_id}\', ' \
+                   f'name=\'{self.name}\')>'
+        else:
+            return f'<forecast.Phase(id=\'{self.id}\', project_id=\'{self.project_id}\')>'
