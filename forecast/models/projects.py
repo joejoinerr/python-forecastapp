@@ -148,19 +148,17 @@ class Project(ForecastBase, object):
     def external_refs(self) -> Optional[List]:
         return self.raw.get('external_refs')
 
-    def phases(self,
-               project_id: int,
-               phase_id: int = None) -> Union['forecast.models.Phase',
-                                              Iterable['forecast.models.Phase'],
-                                              None]:
+    def phases(self, phase_id: Optional[int] = None) -> Union['forecast.models.Phase',
+                                                              List['forecast.models.Phase'],
+                                                              None]:
         if isinstance(phase_id, int):
             return Phase(self._forecast, phase_id, self.id)
         else:
             all_phases = self._forecast.request(API_PATH['milestones']
-                                                .format(project_id=project_id))
+                                                .format(project_id=self.id))
             if all_phases:
-                for raw_phase in all_phases:
-                    yield Phase(self._forecast, raw_phase['id'], self.id, raw=raw_phase)
+                return [Phase(self._forecast, raw_phase['id'], self.id, raw=raw_phase)
+                        for raw_phase in all_phases]
             else:
                 return None
 
