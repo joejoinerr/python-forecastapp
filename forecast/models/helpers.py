@@ -2,7 +2,7 @@ import datetime
 from typing import TYPE_CHECKING, List, Optional, Union
 
 from ..const import API_PATH
-from . import Person, Task, Project
+from . import Person, Task, Project, Role
 
 if TYPE_CHECKING:
     import forecast
@@ -135,3 +135,33 @@ class ProjectsHelper:
                         for raw_project in raw]
             else:
                 return None
+
+
+class RolesHelper:
+    def __init__(self, _forecast: 'forecast.ForecastClient'):
+        self._forecast = _forecast
+
+    def __call__(self,
+                 role_id: Optional[int] = None,
+                 *args,
+                 **kwargs) -> Union[List['forecast.models.Role'],
+                                    'forecast.models.Role',
+                                    None]:
+        if isinstance(role_id, int):
+            return Role(self._forecast, role_id)
+        else:
+            raw = self._forecast.request(API_PATH['roles'])
+            if raw:
+                return [Role(self._forecast, raw_role['id'], raw_role)
+                        for raw_role in raw]
+            else:
+                return None
+
+    def create(self,
+               name: str,
+               *args,
+               **kwargs) -> 'forecast.models.Role':
+        created_role = self._forecast.request(API_PATH['roles'],
+                                              request_type='POST',
+                                              data={'name': name})
+        return Role(self._forecast, created_role['id'], created_role)
