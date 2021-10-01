@@ -2,7 +2,7 @@ import datetime
 from typing import TYPE_CHECKING, List, Optional, Union
 
 from ..const import API_PATH
-from . import Person, Task, Project, Role
+from . import Person, Task, Project, Role, NonProjectTime
 
 if TYPE_CHECKING:
     import forecast
@@ -133,6 +133,27 @@ class ProjectsHelper:
             if raw:
                 return [Project(self._forecast, raw_project['id'], raw_project)
                         for raw_project in raw]
+            else:
+                return None
+
+
+class NPTHelper:
+    def __init__(self, _forecast: 'forecast.ForecastClient'):
+        self._forecast = _forecast
+
+    def __call__(self,
+                 npt_id: Optional[int] = None,
+                 *args,
+                 **kwargs) -> Union[List['forecast.models.NonProjectTime'],
+                                    'forecast.models.NonProjectTime',
+                                    None]:
+        if isinstance(npt_id, int):
+            return NonProjectTime(self._forecast, npt_id)
+        else:
+            raw = self._forecast.request(API_PATH['non_project_time'])
+            if raw:
+                return [NonProjectTime(self._forecast, raw_npt['id'], raw_npt)
+                        for raw_npt in raw]
             else:
                 return None
 

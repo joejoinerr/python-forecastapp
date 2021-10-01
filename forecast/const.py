@@ -6,6 +6,8 @@ ENDPOINT = 'https://api.forecast.it/api'
 API_PATH = {
     'milestone_id': '/v1/projects/{project_id}/milestones/{milestone_id}',
     'milestones': '/v1/projects/{project_id}/milestones',
+    'non_project_time': '/v1/non_project_time',
+    'non_project_time_id': '/v1/non_project_time/{id}',
     'person_id': '/v1/persons/{id}',
     'persons': '/v1/persons',
     'project_id': '/v1/projects/{id}',

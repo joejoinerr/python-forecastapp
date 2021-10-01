@@ -169,6 +169,31 @@ class Project(ForecastBase, object):
             return f'<forecast.Project(id=\'{self.id}\')>'
 
 
+class NonProjectTime(ForecastBase, object):
+    def __init__(self,
+                 _forecast: 'forecast.ForecastClient',
+                 _id: int,
+                 raw: Optional[Dict[str, Any]] = None):
+        self._forecast = _forecast
+        self._id = _id
+        self.raw = raw
+
+    def __getattribute__(self, item):
+        # Lazy load the JSON response so that we can create a NonProjectTime without it
+        if item == 'raw' and not object.__getattribute__(self, 'raw'):
+            path = API_PATH['non_project_time_id'].format(id=object.__getattribute__(self, '_id'))
+            self.raw = object.__getattribute__(self, '_forecast').request(path)
+        return object.__getattribute__(self, item)
+
+    @property
+    def name(self) -> str:
+        return self.raw['name']
+
+    @property
+    def is_internal_time(self) -> bool:
+        return self.raw['is_internal_time']
+
+
 class Phase(ForecastBase, object):
     def __init__(self,
                  _forecast: 'forecast.ForecastClient',
