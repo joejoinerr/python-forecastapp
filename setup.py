@@ -7,7 +7,7 @@ setup(name='python-forecastapp',
       author='Joe Joiner',
       author_email='joe@legato.digital',
       url='https://github.com/joejoinerr/python-forecastapp',
-      packages=['python-forecastapp'],
+      packages=['forecast'],
       install_requires=[
         'requests',
       ])
