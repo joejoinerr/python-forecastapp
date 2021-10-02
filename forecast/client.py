@@ -22,7 +22,7 @@ class ForecastClient:
         self.projects = models.ProjectsHelper(self)
 
         # Interface for interacting with roles
-        self.projects = models.RolesHelper(self)
+        self.roles = models.RolesHelper(self)
 
         # Interface for interacting with NPT
         self.non_project_time = models.NPTHelper(self)
