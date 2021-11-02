@@ -10,6 +10,7 @@ from typing import (
 
 from ..const import API_PATH
 from .base import ForecastBase
+from .helpers import WorkflowHelper
 
 if TYPE_CHECKING:
     import forecast
@@ -23,6 +24,8 @@ class Project(ForecastBase, object):
         self._forecast = _forecast
         self._id = _id
         self.raw = raw
+
+        self.workflow_columns = WorkflowHelper(self._forecast)
 
     def __getattribute__(self, item):
         # Lazy load the JSON response so that we can create a Project without it

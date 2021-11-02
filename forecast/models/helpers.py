@@ -2,7 +2,7 @@ import datetime
 from typing import TYPE_CHECKING, List, Optional, Union
 
 from ..const import API_PATH
-from . import Person, Task, Project, Role, NonProjectTime
+from . import Person, Task, Project, Role, NonProjectTime, WorkflowColumn
 
 if TYPE_CHECKING:
     import forecast
@@ -186,3 +186,46 @@ class RolesHelper:
                                               request_type='POST',
                                               data={'name': name})
         return Role(self._forecast, created_role['id'], created_role)
+
+
+class WorkflowHelper:
+    def __init__(self, _forecast: 'forecast.ForecastClient'):
+        self._forecast = _forecast
+
+    def __call__(self,
+                 project_id: int,
+                 column_id: Optional[int] = None,
+                 *args,
+                 **kwargs) -> Union[List['forecast.models.WorkflowColumn'],
+                                    'forecast.models.WorkflowColumn',
+                                    None]:
+        if isinstance(column_id, int):
+            return WorkflowColumn(self._forecast, column_id, project_id)
+        else:
+            raw = self._forecast.request(API_PATH['workflow'])
+            if raw:
+                return [WorkflowColumn(self._forecast, raw_column['id'], project_id, raw_column)
+                        for raw_column in raw]
+            else:
+                return None
+
+    def create(self,
+               project_id: int,
+               name: str,
+               category: Optional[str] = 'TODO',
+               sort_order: Optional[int] = None):
+        column_data = {
+            'name': name,
+            'category': category,
+        }
+        if isinstance(sort_order, int):
+            column_data.update({'sort_order': sort_order})
+
+        api_path = API_PATH['workflow'].format(project_id=project_id)
+        created_column = self._forecast.request(API_PATH['workflow'],
+                                                request_type='POST',
+                                                data=column_data)
+        return WorkflowColumn(self._forecast,
+                              created_column['id'],
+                              project_id,
+                              created_column)
