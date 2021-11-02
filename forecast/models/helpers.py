@@ -222,7 +222,7 @@ class WorkflowHelper:
             column_data.update({'sort_order': sort_order})
 
         api_path = API_PATH['workflow'].format(project_id=project_id)
-        created_column = self._forecast.request(API_PATH['workflow'],
+        created_column = self._forecast.request(api_path,
                                                 request_type='POST',
                                                 data=column_data)
         return WorkflowColumn(self._forecast,
