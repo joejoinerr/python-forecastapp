@@ -18,4 +18,6 @@ API_PATH = {
     'task_id': '/v2/tasks/{id}',
     'task_company_id': '/v2/tasks/company_task_id/{id}',
     'tasks': '/v2/tasks',
+    'workflow_id': '/v1/projects/{project_id}/workflow_columns/{column_id}',
+    'workflow': '/v1/projects/{project_id}/workflow_columns',
 }

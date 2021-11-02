@@ -3,7 +3,6 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Dict,
-    Iterable,
     List,
     Optional,
     Union
@@ -244,3 +243,43 @@ class Phase(ForecastBase, object):
                    f'name=\'{self.name}\')>'
         else:
             return f'<forecast.Phase(id=\'{self.id}\', project_id=\'{self.project_id}\')>'
+
+
+class WorkflowColumn(ForecastBase, object):
+    def __init__(self,
+                 _forecast: 'forecast.ForecastClient',
+                 _id: int,
+                 _project_id: int,
+                 raw: Optional[Dict[str, Any]] = None):
+        self._forecast = _forecast
+        self._id = _id
+        self._project_id = _project_id
+        self.raw = raw
+
+    def __getattribute__(self, item):
+        # Lazy load the JSON response so that we can create a WorkflowColumn without it
+        if item == 'raw' and not object.__getattribute__(self, 'raw'):
+            path = API_PATH['workflow_id'].format(project_id=object.__getattribute__(self, '_project_id'),
+                                                  column_id=object.__getattribute__(self, '_id'))
+            self.raw = object.__getattribute__(self, '_forecast').request(path)
+        return object.__getattribute__(self, item)
+
+    @property
+    def name(self) -> str:
+        return self.raw['name']
+
+    @property
+    def category(self) -> str:
+        return self.raw['category']
+
+    @property
+    def sort_order(self) -> int:
+        return self.raw['sort_order']
+
+    def __repr__(self):
+        if object.__getattribute__(self, 'raw'):
+            return f'<forecast.WorkflowColumn(id=\'{self.id}\', ' \
+                   f'project_id=\'{self.project_id}\', ' \
+                   f'name=\'{self.name}\')>'
+        else:
+            return f'<forecast.WorkflowColumn(id=\'{self.id}\', project_id=\'{self.project_id}\')>'
