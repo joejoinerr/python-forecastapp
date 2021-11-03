@@ -242,10 +242,10 @@ class Phase(ForecastBase, object):
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):
             return f'<forecast.Phase(id=\'{self.id}\', ' \
-                   f'project_id=\'{self.project_id}\', ' \
+                   f'project_id=\'{self._project_id}\', ' \
                    f'name=\'{self.name}\')>'
         else:
-            return f'<forecast.Phase(id=\'{self.id}\', project_id=\'{self.project_id}\')>'
+            return f'<forecast.Phase(id=\'{self.id}\', project_id=\'{self._project_id}\')>'
 
 
 class WorkflowColumn(ForecastBase, object):
@@ -282,7 +282,7 @@ class WorkflowColumn(ForecastBase, object):
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):
             return f'<forecast.WorkflowColumn(id=\'{self.id}\', ' \
-                   f'project_id=\'{self.project_id}\', ' \
+                   f'project_id=\'{self._project_id}\', ' \
                    f'name=\'{self.name}\')>'
         else:
-            return f'<forecast.WorkflowColumn(id=\'{self.id}\', project_id=\'{self.project_id}\')>'
+            return f'<forecast.WorkflowColumn(id=\'{self.id}\', project_id=\'{self._project_id}\')>'
