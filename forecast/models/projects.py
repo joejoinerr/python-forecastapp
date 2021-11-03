@@ -9,8 +9,8 @@ from typing import (
 )
 
 from ..const import API_PATH
-from .base import ForecastBase
-from .helpers import WorkflowHelper
+import forecast.models
+from forecast.models.base import ForecastBase
 
 if TYPE_CHECKING:
     import forecast
@@ -25,7 +25,7 @@ class Project(ForecastBase, object):
         self._id = _id
         self.raw = raw
 
-        self.workflow_columns = WorkflowHelper(self._forecast)
+        self.workflow_columns = forecast.models.WorkflowHelper(self._forecast)
 
     def __getattribute__(self, item):
         # Lazy load the JSON response so that we can create a Project without it
@@ -216,7 +216,7 @@ class Phase(ForecastBase, object):
         return object.__getattribute__(self, item)
 
     @property
-    def project(self) -> 'forecast.models.projects.Project':
+    def project(self) -> 'forecast.models.Project':
         return Project(self._forecast, self._project_id)
 
     @property

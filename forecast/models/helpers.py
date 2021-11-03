@@ -2,7 +2,7 @@ import datetime
 from typing import TYPE_CHECKING, List, Optional, Union
 
 from ..const import API_PATH
-from . import Person, Task, Project, Role, NonProjectTime, WorkflowColumn
+import forecast.models
 
 if TYPE_CHECKING:
     import forecast
@@ -21,10 +21,10 @@ class TasksHelper:
                                     'forecast.models.Task',
                                     None]:
         if isinstance(task_id, int):
-            return Task(self._forecast, task_id)
+            return forecast.models.Task(self._forecast, task_id)
         elif isinstance(company_id, int):
             raw_task = self._forecast.request(API_PATH['task_company_id'].format(id=company_id))
-            return Task(self._forecast, raw_task['id'], raw_task)
+            return forecast.models.Task(self._forecast, raw_task['id'], raw_task)
         else:
             params = None
             if updated_after:
@@ -35,7 +35,7 @@ class TasksHelper:
                 }
             raw = self._forecast.request(API_PATH['tasks'], params=params)
             if raw:
-                return [Task(self._forecast, raw_task['id'], raw_task) for raw_task in raw]
+                return [forecast.models.Task(self._forecast, raw_task['id'], raw_task) for raw_task in raw]
             else:
                 return None
 
@@ -85,7 +85,7 @@ class TasksHelper:
                                               request_type='POST',
                                               data=new_task)
 
-        return Task(self._forecast, created_task['id'], created_task)
+        return forecast.models.Task(self._forecast, created_task['id'], created_task)
 
 
 class PeopleHelper:
@@ -99,11 +99,11 @@ class PeopleHelper:
                                     'forecast.models.Person',
                                     None]:
         if isinstance(person_id, int):
-            return Person(self._forecast, person_id)
+            return forecast.models.Person(self._forecast, person_id)
         else:
             raw = self._forecast.request(API_PATH['persons'])
             if raw:
-                return [Person(self._forecast, raw_person['id'], raw_person)
+                return [forecast.models.Person(self._forecast, raw_person['id'], raw_person)
                         for raw_person in raw]
             else:
                 return None
@@ -124,14 +124,14 @@ class ProjectsHelper:
             raise ValueError('Only one of `project_id` or `company_id` should be supplied.')
 
         if isinstance(project_id, int):
-            return Project(self._forecast, project_id)
+            return forecast.models.Project(self._forecast, project_id)
         elif isinstance(company_id, int):
             raw_project = self._forecast.request(API_PATH['project_company_id'].format(id=company_id))
-            return Project(self._forecast, raw_project['id'], raw_project)
+            return forecast.models.Project(self._forecast, raw_project['id'], raw_project)
         else:
             raw = self._forecast.request(API_PATH['projects'])
             if raw:
-                return [Project(self._forecast, raw_project['id'], raw_project)
+                return [forecast.models.Project(self._forecast, raw_project['id'], raw_project)
                         for raw_project in raw]
             else:
                 return None
@@ -148,11 +148,11 @@ class NPTHelper:
                                     'forecast.models.NonProjectTime',
                                     None]:
         if isinstance(npt_id, int):
-            return NonProjectTime(self._forecast, npt_id)
+            return forecast.models.NonProjectTime(self._forecast, npt_id)
         else:
             raw = self._forecast.request(API_PATH['non_project_time'])
             if raw:
-                return [NonProjectTime(self._forecast, raw_npt['id'], raw_npt)
+                return [forecast.models.NonProjectTime(self._forecast, raw_npt['id'], raw_npt)
                         for raw_npt in raw]
             else:
                 return None
@@ -169,11 +169,11 @@ class RolesHelper:
                                     'forecast.models.Role',
                                     None]:
         if isinstance(role_id, int):
-            return Role(self._forecast, role_id)
+            return forecast.models.Role(self._forecast, role_id)
         else:
             raw = self._forecast.request(API_PATH['roles'])
             if raw:
-                return [Role(self._forecast, raw_role['id'], raw_role)
+                return [forecast.models.Role(self._forecast, raw_role['id'], raw_role)
                         for raw_role in raw]
             else:
                 return None
@@ -185,7 +185,7 @@ class RolesHelper:
         created_role = self._forecast.request(API_PATH['roles'],
                                               request_type='POST',
                                               data={'name': name})
-        return Role(self._forecast, created_role['id'], created_role)
+        return forecast.models.Role(self._forecast, created_role['id'], created_role)
 
 
 class WorkflowHelper:
@@ -200,11 +200,11 @@ class WorkflowHelper:
                                     'forecast.models.WorkflowColumn',
                                     None]:
         if isinstance(column_id, int):
-            return WorkflowColumn(self._forecast, column_id, project_id)
+            return forecast.models.WorkflowColumn(self._forecast, column_id, project_id)
         else:
             raw = self._forecast.request(API_PATH['workflow'])
             if raw:
-                return [WorkflowColumn(self._forecast, raw_column['id'], project_id, raw_column)
+                return [forecast.models.WorkflowColumn(self._forecast, raw_column['id'], project_id, raw_column)
                         for raw_column in raw]
             else:
                 return None
@@ -225,7 +225,7 @@ class WorkflowHelper:
         created_column = self._forecast.request(api_path,
                                                 request_type='POST',
                                                 data=column_data)
-        return WorkflowColumn(self._forecast,
-                              created_column['id'],
-                              project_id,
-                              created_column)
+        return forecast.models.WorkflowColumn(self._forecast,
+                                              created_column['id'],
+                                              project_id,
+                                              created_column)

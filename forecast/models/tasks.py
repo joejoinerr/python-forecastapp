@@ -8,9 +8,8 @@ from typing import (
 )
 
 from ..const import API_PATH
-from .base import ForecastBase
-from .people import Person
-from .projects import Phase
+import forecast.models
+from forecast.models.base import ForecastBase
 
 if TYPE_CHECKING:
     import forecast
@@ -105,16 +104,16 @@ class Task(ForecastBase, object):
         return self.raw.get('workflow_column')
 
     @property
-    def phase(self) -> Optional['forecast.models.projects.Phase']:
+    def phase(self) -> Optional['forecast.models.Phase']:
         phase = self.raw.get('milestone')
         if phase:
-            return Phase(self._forecast, phase, self.project_id)
+            return forecast.models.Phase(self._forecast, phase, self.project_id)
 
     @property
-    def assigned(self) -> Optional[List[Person]]:
+    def assigned(self) -> Optional[List['forecast.models.Person']]:
         assigned = self.raw.get('assigned_persons')
         if assigned:
-            return [Person(self._forecast, person)
+            return [forecast.models.Person(self._forecast, person)
                     for person in assigned]
         else:
             return None
@@ -124,10 +123,10 @@ class Task(ForecastBase, object):
         return self.raw.get('labels')
 
     @property
-    def owner(self) -> Optional[Person]:
+    def owner(self) -> Optional['forecast.models.Person']:
         owner = self.raw.get('owner_id')
         if owner:
-            return Person(self._forecast, owner)
+            return forecast.models.Person(self._forecast, owner)
         else:
             return None
 

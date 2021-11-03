@@ -2,7 +2,7 @@ from typing import Optional
 
 import requests
 
-from . import models
+import forecast.models
 from .exceptions import ForecastAPIError
 
 
@@ -13,19 +13,19 @@ class ForecastClient:
 
         # Interface for interacting with people, including creating new people.
         # To get an individual person, use `ForecastClient.person()`
-        self.people = models.PeopleHelper(self)
+        self.people = forecast.models.PeopleHelper(self)
 
         # Interface frore interacting with tasks
-        self.tasks = models.TasksHelper(self)
+        self.tasks = forecast.models.TasksHelper(self)
 
         # Interface frore interacting with projects
-        self.projects = models.ProjectsHelper(self)
+        self.projects = forecast.models.ProjectsHelper(self)
 
         # Interface for interacting with roles
-        self.roles = models.RolesHelper(self)
+        self.roles = forecast.models.RolesHelper(self)
 
         # Interface for interacting with NPT
-        self.non_project_time = models.NPTHelper(self)
+        self.non_project_time = forecast.models.NPTHelper(self)
 
     def request(self,
                 path: str,

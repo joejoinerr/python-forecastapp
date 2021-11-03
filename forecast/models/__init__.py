@@ -7,5 +7,6 @@ from .helpers import (
     TasksHelper,
     ProjectsHelper,
     RolesHelper,
-    NPTHelper
+    NPTHelper,
+    WorkflowHelper
 )
