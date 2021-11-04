@@ -25,7 +25,8 @@ class Project(ForecastBase, object):
         self._id = _id
         self.raw = raw
 
-        self.workflow_columns = forecast.models.WorkflowHelper(self._forecast)
+        self.workflow_columns = forecast.models.WorkflowHelper(self._forecast,
+                                                               self._id)
 
     def __getattribute__(self, item):
         # Lazy load the JSON response so that we can create a Project without it

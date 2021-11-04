@@ -189,28 +189,29 @@ class RolesHelper:
 
 
 class WorkflowHelper:
-    def __init__(self, _forecast: 'forecast.ForecastClient'):
+    def __init__(self,
+                 _forecast: 'forecast.ForecastClient',
+                 _project_id: int):
         self._forecast = _forecast
+        self._project_id = _project_id
 
     def __call__(self,
-                 project_id: int,
                  column_id: Optional[int] = None,
                  *args,
                  **kwargs) -> Union[List['forecast.models.WorkflowColumn'],
                                     'forecast.models.WorkflowColumn',
                                     None]:
         if isinstance(column_id, int):
-            return forecast.models.WorkflowColumn(self._forecast, column_id, project_id)
+            return forecast.models.WorkflowColumn(self._forecast, column_id, self._project_id)
         else:
             raw = self._forecast.request(API_PATH['workflow'])
             if raw:
-                return [forecast.models.WorkflowColumn(self._forecast, raw_column['id'], project_id, raw_column)
+                return [forecast.models.WorkflowColumn(self._forecast, raw_column['id'], self._project_id, raw_column)
                         for raw_column in raw]
             else:
                 return None
 
     def create(self,
-               project_id: int,
                name: str,
                category: Optional[str] = 'TODO',
                sort_order: Optional[int] = None):
@@ -221,11 +222,11 @@ class WorkflowHelper:
         if isinstance(sort_order, int):
             column_data.update({'sort_order': sort_order})
 
-        api_path = API_PATH['workflow'].format(project_id=project_id)
+        api_path = API_PATH['workflow'].format(project_id=self._project_id)
         created_column = self._forecast.request(api_path,
                                                 request_type='POST',
                                                 data=column_data)
         return forecast.models.WorkflowColumn(self._forecast,
                                               created_column['id'],
-                                              project_id,
+                                              self._project_id,
                                               created_column)
