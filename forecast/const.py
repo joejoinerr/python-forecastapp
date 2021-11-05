@@ -4,6 +4,8 @@ ENDPOINT = 'https://api.forecast.it/api'
 
 # All known API paths
 API_PATH = {
+    'label_id': '/v1/labels/{id}',
+    'labels': '/v1/labels',
     'milestone_id': '/v1/projects/{project_id}/milestones/{milestone_id}',
     'milestones': '/v1/projects/{project_id}/milestones',
     'non_project_time': '/v1/non_project_time',

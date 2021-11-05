@@ -24,6 +24,9 @@ class ForecastClient:
         # Interface for interacting with roles
         self.roles = forecast.models.RolesHelper(self)
 
+        # Interface for interacting with labels
+        self.labels = forecast.models.LabelsHelper(self)
+
         # Interface for interacting with NPT
         self.non_project_time = forecast.models.NPTHelper(self)
 

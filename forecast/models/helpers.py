@@ -188,6 +188,41 @@ class RolesHelper:
         return forecast.models.Role(self._forecast, created_role['id'], created_role)
 
 
+class LabelsHelper:
+    def __init__(self, _forecast: 'forecast.ForecastClient'):
+        self._forecast = _forecast
+
+    def __call__(self,
+                 label_id: Optional[int] = None,
+                 *args,
+                 **kwargs) -> Union[List['forecast.models.Label'],
+                                    'forecast.models.Label',
+                                    None]:
+        if isinstance(label_id, int):
+            return forecast.models.Label(self._forecast, label_id)
+        else:
+            raw = self._forecast.request(API_PATH['labels'])
+            if raw:
+                return [forecast.models.Role(self._forecast, raw_label['id'], raw_label)
+                        for raw_label in raw]
+            else:
+                return None
+
+    def create(self,
+               name: str,
+               color: Optional[str],
+               *args,
+               **kwargs) -> 'forecast.models.Label':
+        label_data = {
+            'name': name,
+            'color': color,
+        }
+        created_label = self._forecast.request(API_PATH['labels'],
+                                               request_type='POST',
+                                               data=label_data)
+        return forecast.models.Label(self._forecast, created_label['id'], created_label)
+
+
 class WorkflowHelper:
     def __init__(self,
                  _forecast: 'forecast.ForecastClient',
