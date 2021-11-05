@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     import forecast
 
 
-class Role(ForecastBase, object):
+class Label(ForecastBase, object):
     def __init__(self,
                  _forecast: 'forecast.ForecastClient',
                  _id: int,
