@@ -204,7 +204,7 @@ class WorkflowHelper:
         if isinstance(column_id, int):
             return forecast.models.WorkflowColumn(self._forecast, column_id, self._project_id)
         else:
-            raw = self._forecast.request(API_PATH['workflow'])
+            raw = self._forecast.request(API_PATH['workflow'].format(project_id=self._project_id))
             if raw:
                 return [forecast.models.WorkflowColumn(self._forecast, raw_column['id'], self._project_id, raw_column)
                         for raw_column in raw]
