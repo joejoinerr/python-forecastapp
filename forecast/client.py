@@ -52,7 +52,7 @@ class ForecastClient:
         req = requests.Request(request_type, f'https://api.forecast.it/api{path}',
                                params=params,
                                headers=final_headers,
-                               data=data)
+                               json=data)
         prepped = self._session.prepare_request(req)
 
         res = self._session.send(prepped)
