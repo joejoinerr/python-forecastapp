@@ -203,7 +203,7 @@ class LabelsHelper:
         else:
             raw = self._forecast.request(API_PATH['labels'])
             if raw:
-                return [forecast.models.Role(self._forecast, raw_label['id'], raw_label)
+                return [forecast.models.Label(self._forecast, raw_label['id'], raw_label)
                         for raw_label in raw]
             else:
                 return None
