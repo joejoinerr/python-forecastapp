@@ -12,7 +12,6 @@ class ForecastClient:
         self._session = requests.Session()
 
         # Interface for interacting with people, including creating new people.
-        # To get an individual person, use `ForecastClient.person()`
         self.people = forecast.models.PeopleHelper(self)
 
         # Interface frore interacting with tasks
