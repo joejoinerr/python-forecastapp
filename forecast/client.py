@@ -49,7 +49,8 @@ class ForecastClient:
         if isinstance(headers, dict):
             final_headers.update(headers)
 
-        req = requests.Request(request_type, f'https://api.forecast.it/api{path}',
+        req = requests.Request(request_type,
+                               f'https://api.forecast.it/api{path}',
                                params=params,
                                headers=final_headers,
                                json=data)
@@ -61,6 +62,7 @@ class ForecastClient:
             res.raise_for_status()
         except requests.exceptions.HTTPError as e:
             message = json.get('message')
-            raise ForecastAPIError(f'Forecast API responded with status {res.status_code}: {message}') from e
+            raise ForecastAPIError(f'Forecast API responded with status '
+                                   f'{res.status_code}: {message}') from e
 
         return json

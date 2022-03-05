@@ -20,16 +20,9 @@ class Task(ForecastBase, object):
                  _forecast: 'forecast.ForecastClient',
                  _id: int,
                  raw: Optional[Dict[str, Any]] = None):
-        self._forecast = _forecast
-        self._id = _id
-        self.raw = raw
-
-    def __getattribute__(self, item):
-        # Lazy load the JSON response so that we can create a Task without it
-        if item == 'raw' and not object.__getattribute__(self, 'raw'):
-            path = API_PATH['task_id'].format(id=object.__getattribute__(self, '_id'))
-            self.raw = object.__getattribute__(self, '_forecast').request(path)
-        return object.__getattribute__(self, item)
+        super(Task, self).__init__(_forecast, _id, raw)
+        self.path = API_PATH['task_id'].format(
+            id=object.__getattribute__(self, '_id'))
 
     @property
     def company_task_id(self) -> int:
@@ -132,6 +125,7 @@ class Task(ForecastBase, object):
 
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):
-            return f'<forecast.Task(id=\'{self.id}\', title=\'{self.title}\')>'
+            return (f'<forecast.{type(self).__name__}(id=\'{self.id}\', '
+                    f'title=\'{self.title}\')>')
         else:
-            return f'<forecast.Task(id=\'{self.id}\')>'
+            return f'<forecast.{type(self).__name__}(id=\'{self.id}\')>'
