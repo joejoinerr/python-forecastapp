@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, Literal, Optional
 
 import requests
 
@@ -32,10 +32,10 @@ class ForecastClient:
 
     def request(self,
                 path: str,
-                request_type: Optional[str] = 'GET',
-                params: Optional[dict] = None,
-                headers: Optional[dict] = None,
-                data: Optional[dict] = None) -> dict:
+                request_type: Literal['GET', 'POST', 'PUT', 'DELETE'] = 'GET',
+                params: Optional[Dict[str, Any]] = None,
+                headers: Optional[Dict[str, str]] = None,
+                data: Optional[Dict[str, Any]] = None) -> dict:
         request_type = request_type.upper()
         valid_types = {'GET', 'POST', 'PUT', 'DELETE'}
         if request_type not in valid_types:
