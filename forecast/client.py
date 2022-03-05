@@ -37,10 +37,6 @@ class ForecastClient:
                 headers: Optional[Dict[str, str]] = None,
                 data: Optional[Dict[str, Any]] = None) -> dict:
         request_type = request_type.upper()
-        valid_types = {'GET', 'POST', 'PUT', 'DELETE'}
-        if request_type not in valid_types:
-            raise ValueError(f'`request_type` should be one of: '
-                             f'{", ".join(valid_types)}.')
 
         final_headers = {
             'x-forecast-api-key': self.api_key,
