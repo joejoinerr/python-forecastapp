@@ -11,6 +11,7 @@ from typing import (
 from ..const import API_PATH
 import forecast.models
 from forecast.models.base import ForecastBase
+from forecast.models.people import Person, ProjectTeam
 
 if TYPE_CHECKING:
     import forecast
@@ -21,19 +22,11 @@ class Project(ForecastBase, object):
                  _forecast: 'forecast.ForecastClient',
                  _id: int,
                  raw: Optional[Dict[str, Any]] = None):
-        self._forecast = _forecast
-        self._id = _id
-        self.raw = raw
-
+        super(Project, self).__init__(_forecast, _id, raw)
+        self.path = API_PATH['project_id'].format(
+            id=object.__getattribute__(self, '_id'))
         self.workflow_columns = forecast.models.WorkflowHelper(self._forecast,
                                                                self._id)
-
-    def __getattribute__(self, item):
-        # Lazy load the JSON response so that we can create a Project without it
-        if item == 'raw' and not object.__getattribute__(self, 'raw'):
-            path = API_PATH['project_id'].format(id=object.__getattribute__(self, '_id'))
-            self.raw = object.__getattribute__(self, '_forecast').request(path)
-        return object.__getattribute__(self, item)
 
     @property
     def company_project_id(self) -> int:
@@ -151,9 +144,10 @@ class Project(ForecastBase, object):
     def external_refs(self) -> Optional[List]:
         return self.raw.get('external_refs')
 
-    def phases(self, phase_id: Optional[int] = None) -> Union['forecast.models.Phase',
-                                                              List['forecast.models.Phase'],
-                                                              None]:
+    def phases(
+        self,
+        phase_id: Optional[int] = None
+    ) -> Union['forecast.models.Phase', List['forecast.models.Phase'], None]:
         if isinstance(phase_id, int):
             return Phase(self._forecast, phase_id, self.id)
         else:
@@ -165,11 +159,19 @@ class Project(ForecastBase, object):
             else:
                 return None
 
+    def team(self) -> Optional[ProjectTeam]:
+        raw_team = self._forecast.request(API_PATH['project_team'].format(id=self.id))
+        if raw_team:
+            return ProjectTeam(self._forecast, self, raw_team)
+        else:
+            return None
+
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):
-            return f'<forecast.Project(id=\'{self.id}\', name=\'{self.name}\')>'
+            return (f'<forecast.{type(self).__name__}(id=\'{self.id}\', '
+                    f'name=\'{self.name}\')>')
         else:
-            return f'<forecast.Project(id=\'{self.id}\')>'
+            return f'<forecast.{type(self).__name__}(id=\'{self.id}\')>'
 
 
 class NonProjectTime(ForecastBase, object):
@@ -177,16 +179,9 @@ class NonProjectTime(ForecastBase, object):
                  _forecast: 'forecast.ForecastClient',
                  _id: int,
                  raw: Optional[Dict[str, Any]] = None):
-        self._forecast = _forecast
-        self._id = _id
-        self.raw = raw
-
-    def __getattribute__(self, item):
-        # Lazy load the JSON response so that we can create a NonProjectTime without it
-        if item == 'raw' and not object.__getattribute__(self, 'raw'):
-            path = API_PATH['non_project_time_id'].format(id=object.__getattribute__(self, '_id'))
-            self.raw = object.__getattribute__(self, '_forecast').request(path)
-        return object.__getattribute__(self, item)
+        super(NonProjectTime, self).__init__(_forecast, _id, raw)
+        self.path = API_PATH['non_project_time_id'].format(
+            id=object.__getattribute__(self, '_id'))
 
     @property
     def name(self) -> str:
@@ -196,6 +191,13 @@ class NonProjectTime(ForecastBase, object):
     def is_internal_time(self) -> bool:
         return self.raw['is_internal_time']
 
+    def __repr__(self):
+        if object.__getattribute__(self, 'raw'):
+            return (f'<forecast.{type(self).__name__}(id=\'{self.id}\', '
+                    f'name=\'{self.name}\')>')
+        else:
+            return f'<forecast.{type(self).__name__}(id=\'{self.id}\')>'
+
 
 class Phase(ForecastBase, object):
     def __init__(self,
@@ -203,18 +205,11 @@ class Phase(ForecastBase, object):
                  _id: int,
                  _project_id: int,
                  raw: Optional[Dict[str, Any]] = None):
-        self._forecast = _forecast
-        self._id = _id
+        super(Phase, self).__init__(_forecast, _id, raw)
+        self.path = API_PATH['milestone_id'].format(
+            project_id=object.__getattribute__(self, '_project_id'),
+            milestone_id=object.__getattribute__(self, '_id'))
         self._project_id = _project_id
-        self.raw = raw
-
-    def __getattribute__(self, item):
-        # Lazy load the JSON response so that we can create a Phase without it
-        if item == 'raw' and not object.__getattribute__(self, 'raw'):
-            path = API_PATH['milestone_id'].format(project_id=object.__getattribute__(self, '_project_id'),
-                                                   milestone_id=object.__getattribute__(self, '_id'))
-            self.raw = object.__getattribute__(self, '_forecast').request(path)
-        return object.__getattribute__(self, item)
 
     @property
     def project(self) -> 'forecast.models.Project':
@@ -242,11 +237,12 @@ class Phase(ForecastBase, object):
 
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):
-            return f'<forecast.Phase(id=\'{self.id}\', ' \
-                   f'project_id=\'{self._project_id}\', ' \
-                   f'name=\'{self.name}\')>'
+            return (f'<forecast.{type(self).__name__}(id=\'{self.id}\', '
+                    f'project_id=\'{self._project_id}\', '
+                    f'name=\'{self.name}\')>')
         else:
-            return f'<forecast.Phase(id=\'{self.id}\', project_id=\'{self._project_id}\')>'
+            return (f'<forecast.{type(self).__name__}(id=\'{self.id}\', '
+                    f'project_id=\'{self._project_id}\')>')
 
 
 class WorkflowColumn(ForecastBase, object):
@@ -255,18 +251,11 @@ class WorkflowColumn(ForecastBase, object):
                  _id: int,
                  _project_id: int,
                  raw: Optional[Dict[str, Any]] = None):
-        self._forecast = _forecast
-        self._id = _id
+        super(WorkflowColumn, self).__init__(_forecast, _id, raw)
+        self.path = API_PATH['workflow_id'].format(
+            project_id=object.__getattribute__(self, '_project_id'),
+            column_id=object.__getattribute__(self, '_id'))
         self._project_id = _project_id
-        self.raw = raw
-
-    def __getattribute__(self, item):
-        # Lazy load the JSON response so that we can create a WorkflowColumn without it
-        if item == 'raw' and not object.__getattribute__(self, 'raw'):
-            path = API_PATH['workflow_id'].format(project_id=object.__getattribute__(self, '_project_id'),
-                                                  column_id=object.__getattribute__(self, '_id'))
-            self.raw = object.__getattribute__(self, '_forecast').request(path)
-        return object.__getattribute__(self, item)
 
     @property
     def name(self) -> str:
@@ -282,8 +271,9 @@ class WorkflowColumn(ForecastBase, object):
 
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):
-            return f'<forecast.WorkflowColumn(id=\'{self.id}\', ' \
-                   f'project_id=\'{self._project_id}\', ' \
-                   f'name=\'{self.name}\')>'
+            return (f'<forecast.{type(self).__name__}(id=\'{self.id}\', '
+                    f'project_id=\'{self._project_id}\', '
+                    f'name=\'{self.name}\')>')
         else:
-            return f'<forecast.WorkflowColumn(id=\'{self.id}\', project_id=\'{self._project_id}\')>'
+            return (f'<forecast.{type(self).__name__}(id=\'{self.id}\', '
+                    f'project_id=\'{self._project_id}\')>')

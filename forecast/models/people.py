@@ -1,30 +1,20 @@
 from typing import TYPE_CHECKING, Any, Optional, Dict
 
+from .base import ForecastBase
 from ..const import API_PATH
 
 if TYPE_CHECKING:
     import forecast
 
 
-class Person(object):
+class Person(ForecastBase, object):
     def __init__(self,
                  _forecast: 'forecast.ForecastClient',
                  _id: int,
                  raw: Optional[Dict[str, Any]] = None):
-        self._forecast = _forecast
-        self._id = _id
-        self.raw = raw
-
-    def __getattribute__(self, item):
-        # Lazy load the JSON response so that we can create a Person without it
-        if item == 'raw' and not object.__getattribute__(self, 'raw'):
-            path = API_PATH['person_id'].format(id=object.__getattribute__(self, '_id'))
-            self.raw = object.__getattribute__(self, '_forecast').request(path)
-        return object.__getattribute__(self, item)
-
-    @property
-    def id(self) -> int:
-        return self._id
+        super(Person, self).__init__(_forecast, _id, raw)
+        self.path = API_PATH['person_id'].format(
+            id=object.__getattribute__(self, '_id'))
 
     @property
     def name(self) -> str:
@@ -78,16 +68,55 @@ class Person(object):
     def end_date(self) -> Optional[str]:
         return self.raw.get('end_date')
 
-    @property
-    def created_at(self) -> str:
-        return self.raw['created_at']
+    def __repr__(self):
+        if object.__getattribute__(self, 'raw'):
+            return (f'<forecast.{type(self).__name__}(id=\'{self.id}\', '
+                    f'name=\'{self.name}\')>')
+        else:
+            return f'<forecast.{type(self).__name__}(id=\'{self.id}\')>'
+
+
+class ProjectTeam:
+    def __init__(self,
+                 _forecast: 'forecast.ForecastClient',
+                 project: 'forecast.models.Project',
+                 raw: Optional[Dict[str, Any]] = None):
+        self._forecast = _forecast
+        self.project = project
+        self.raw = raw
+
+    def __len__(self):
+        return len(self.members)
+
+    def __iter__(self):
+        return iter(self.members)
 
     @property
-    def updated_at(self) -> str:
-        return self.raw['updated_at']
+    def members(self):
+        return [ProjectTeamMember(self._forecast,
+                                  member['person_id'],
+                                  self.project,
+                                  member['project_role'],
+                                  member['project_contact'])
+                for member in self.raw]
 
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):
-            return f'<forecast.Person(id=\'{self.id}\', name=\'{self.name}\')>'
+            return (f'<forecast.{type(self).__name__}(project=\'{self.project.id}\', '
+                    f'members=\'{len(self)}\')>')
         else:
-            return f'<forecast.Person(id=\'{self.id}\')>'
+            return f'<forecast.{type(self).__name__}(project=\'{self.project.id}\')>'
+
+
+class ProjectTeamMember(Person):
+    def __init__(self,
+                 _forecast: 'forecast.ForecastClient',
+                 _id: int,
+                 project: 'forecast.models.Project',
+                 _project_role: int,
+                 project_contact: bool):
+        super(ProjectTeamMember, self).__init__(_forecast, _id)
+        self.project = project
+        self._project_role = _project_role
+        self.project_contact = project_contact
+        

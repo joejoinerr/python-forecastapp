@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, Literal, Optional
 
 import requests
 
@@ -12,7 +12,6 @@ class ForecastClient:
         self._session = requests.Session()
 
         # Interface for interacting with people, including creating new people.
-        # To get an individual person, use `ForecastClient.person()`
         self.people = forecast.models.PeopleHelper(self)
 
         # Interface frore interacting with tasks
@@ -32,16 +31,11 @@ class ForecastClient:
 
     def request(self,
                 path: str,
-                request_type: Optional[str] = 'GET',
-                params: Optional[dict] = None,
-                headers: Optional[dict] = None,
-                data: Optional[dict] = None) -> dict:
-        if not isinstance(request_type, str):
-            raise TypeError('`request_type` should be string.')
+                request_type: Literal['GET', 'POST', 'PUT', 'DELETE'] = 'GET',
+                params: Optional[Dict[str, Any]] = None,
+                headers: Optional[Dict[str, str]] = None,
+                data: Optional[Dict[str, Any]] = None) -> dict:
         request_type = request_type.upper()
-        valid_types = {'GET', 'POST', 'PUT', 'DELETE'}
-        if request_type not in valid_types:
-            raise ValueError(f'`request_type` should be one of: {", ".join(valid_types)}.')
 
         final_headers = {
             'x-forecast-api-key': self.api_key,
@@ -49,7 +43,8 @@ class ForecastClient:
         if isinstance(headers, dict):
             final_headers.update(headers)
 
-        req = requests.Request(request_type, f'https://api.forecast.it/api{path}',
+        req = requests.Request(request_type,
+                               f'https://api.forecast.it/api{path}',
                                params=params,
                                headers=final_headers,
                                json=data)
@@ -61,6 +56,7 @@ class ForecastClient:
             res.raise_for_status()
         except requests.exceptions.HTTPError as e:
             message = json.get('message')
-            raise ForecastAPIError(f'Forecast API responded with status {res.status_code}: {message}') from e
+            raise ForecastAPIError(f'Forecast API responded with status '
+                                   f'{res.status_code}: {message}') from e
 
         return json
