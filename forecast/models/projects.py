@@ -11,6 +11,7 @@ from typing import (
 from ..const import API_PATH
 import forecast.models
 from forecast.models.base import ForecastBase
+from forecast.models.people import Person, ProjectTeam
 
 if TYPE_CHECKING:
     import forecast
@@ -157,6 +158,13 @@ class Project(ForecastBase, object):
                         for raw_phase in all_phases]
             else:
                 return None
+
+    def team(self) -> Optional[ProjectTeam]:
+        raw_team = self._forecast.request(API_PATH['project_team'].format(id=self.id))
+        if raw_team:
+            return ProjectTeam(self._forecast, self, raw_team)
+        else:
+            return None
 
     def __repr__(self):
         if object.__getattribute__(self, 'raw'):

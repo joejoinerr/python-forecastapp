@@ -74,3 +74,49 @@ class Person(ForecastBase, object):
                     f'name=\'{self.name}\')>')
         else:
             return f'<forecast.{type(self).__name__}(id=\'{self.id}\')>'
+
+
+class ProjectTeam:
+    def __init__(self,
+                 _forecast: 'forecast.ForecastClient',
+                 project: 'forecast.models.Project',
+                 raw: Optional[Dict[str, Any]] = None):
+        self._forecast = _forecast
+        self.project = project
+        self.raw = raw
+
+    def __len__(self):
+        return len(self.members)
+
+    def __iter__(self):
+        return iter(self.members)
+
+    @property
+    def members(self):
+        return [ProjectTeamMember(self._forecast,
+                                  member['person_id'],
+                                  self.project,
+                                  member['project_role'],
+                                  member['project_contact'])
+                for member in self.raw]
+
+    def __repr__(self):
+        if object.__getattribute__(self, 'raw'):
+            return (f'<forecast.{type(self).__name__}(project=\'{self.project.id}\', '
+                    f'members=\'{len(self)}\')>')
+        else:
+            return f'<forecast.{type(self).__name__}(project=\'{self.project.id}\')>'
+
+
+class ProjectTeamMember(Person):
+    def __init__(self,
+                 _forecast: 'forecast.ForecastClient',
+                 _id: int,
+                 project: 'forecast.models.Project',
+                 _project_role: int,
+                 project_contact: bool):
+        super(ProjectTeamMember, self).__init__(_forecast, _id)
+        self.project = project
+        self._project_role = _project_role
+        self.project_contact = project_contact
+        

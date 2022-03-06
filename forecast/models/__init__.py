@@ -1,4 +1,4 @@
-from .people import Person
+from .people import Person, ProjectTeam
 from .roles import Role
 from .labels import Label
 from .tasks import Task

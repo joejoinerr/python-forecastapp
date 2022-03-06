@@ -13,6 +13,7 @@ API_PATH = {
     'person_id': '/v1/persons/{id}',
     'persons': '/v1/persons',
     'project_id': '/v1/projects/{id}',
+    'project_team': '/v1/projects/{id}/team',
     'project_company_id': '/v1/projects/company_project_id/{id}',
     'projects': '/v1/projects',
     'role_id': '/v1/roles/{id}',
