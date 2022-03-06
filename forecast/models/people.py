@@ -85,11 +85,11 @@ class ProjectTeam:
         self.project = project
         self.raw = raw
 
+    def __getitem__(self, item):
+        return self.members[item]
+
     def __len__(self):
         return len(self.members)
-
-    def __iter__(self):
-        return iter(self.members)
 
     @property
     def members(self):
