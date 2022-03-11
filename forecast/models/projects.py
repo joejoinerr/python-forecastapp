@@ -206,10 +206,10 @@ class Phase(ForecastBase, object):
                  _project_id: int,
                  raw: Optional[Dict[str, Any]] = None):
         super(Phase, self).__init__(_forecast, _id, raw)
+        self._project_id = _project_id
         self.path = API_PATH['milestone_id'].format(
             project_id=object.__getattribute__(self, '_project_id'),
             milestone_id=object.__getattribute__(self, '_id'))
-        self._project_id = _project_id
 
     @property
     def project(self) -> 'forecast.models.Project':
@@ -252,10 +252,10 @@ class WorkflowColumn(ForecastBase, object):
                  _project_id: int,
                  raw: Optional[Dict[str, Any]] = None):
         super(WorkflowColumn, self).__init__(_forecast, _id, raw)
+        self._project_id = _project_id
         self.path = API_PATH['workflow_id'].format(
             project_id=object.__getattribute__(self, '_project_id'),
             column_id=object.__getattribute__(self, '_id'))
-        self._project_id = _project_id
 
     @property
     def name(self) -> str:
